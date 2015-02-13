@@ -8,14 +8,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -sf /bin/true /sbin/initctl
 
-# Scripts
-ADD ./scripts/start.sh /sbin/start.sh
-ADD ./scripts/sshd.sh /sbin/sshd.sh
-ADD ./scripts/cron.sh /sbin/cron.sh
-
-# Make them executable
-RUN chmod 755 /sbin/start.sh /sbin/cron.sh /sbin/sshd.sh
-
+# Install services
 RUN apt-get update
 RUN apt-get install -y --force-yes ssh cron
 
@@ -28,6 +21,14 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
+
+# Scripts
+ADD ./scripts/start.sh /sbin/start.sh
+ADD ./scripts/sshd.sh /sbin/sshd.sh
+ADD ./scripts/cron.sh /sbin/cron.sh
+
+# Make them executable
+RUN chmod 755 /sbin/start.sh /sbin/cron.sh /sbin/sshd.sh
 
 EXPOSE 22
 CMD ["/bin/bash", "/sbin/start.sh"]
